@@ -1,0 +1,225 @@
+﻿<Window x:Class="TerrariumThermostat.MainWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:my="clr-namespace:TerrariumThermostat"
+    xmlns:toolkit="http://schemas.microsoft.com/wpf/2008/toolkit"
+    xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+    xmlns:chartPrmtvs="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+    xmlns:dataVis="clr-namespace:System.Windows.Controls.DataVisualization;assembly=System.Windows.Controls.DataVisualization.Toolkit"   
+    Title="Terrarium Thermostat" Height="950" Width="1700" FontFamily="Times New Roman" FontSize="10.0" WindowStyle="SingleBorderWindow">
+    <Window.Resources>
+        <my:OnOfConverter x:Key="onOfConverter" />
+        <my:DoubleConverterFixedTwo x:Key="doubleConverterFixedTwo" />
+        <my:StateConverter x:Key="stateConverter" />
+        <my:DateTimeConverter x:Key="dateTimeConverter" />
+
+        <Style TargetType="{x:Type DataGrid}">
+            <Style.Setters>
+                <Setter Property="AlternatingRowBackground" Value="LightGray" />
+                <Setter Property="AlternationCount" Value="1" />
+            </Style.Setters>
+        </Style>
+        <Style TargetType="{x:Type DataGridCell}">
+            <Style.Setters>
+                <Setter Property="BorderThickness" Value="2"></Setter>
+            </Style.Setters>
+        </Style>
+
+        <Style x:Key="gridLineStyle" TargetType="Line">
+            <Setter Property="Stroke" Value="Red"/>
+            <Setter Property="Opacity" Value="0.2"/>
+            <Setter Property="StrokeThickness" Value="1"/>
+        </Style>
+        <Style x:Key="polyLineStyle" TargetType="{x:Type Polyline}">
+            <Setter Property="Opacity" Value="1.0" />
+            <Setter Property="Stroke" Value="Blue" />
+            <Setter Property="StrokeThickness" Value="2.0" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="0,0,0,0">
+        <Grid.Resources>
+            <!-- chart style modified from WPFToolkit\DataVisualization\Themes\generic.xaml -->
+            <Style TargetType="charting:Chart">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="charting:Chart">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <dataVis:Title Content="{TemplateBinding Title}" Style="{TemplateBinding TitleStyle}" Margin="1"/>
+                                <!-- Use a nested Grid to avoid possible clipping behavior resulting from ColumnSpan+Width=Auto -->
+                                <Grid Grid.Row="1" Margin="0,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <dataVis:Legend x:Name="Legend" Title="{TemplateBinding LegendTitle}" Style="{TemplateBinding LegendStyle}" Grid.Column="1" Margin="3 0 0 0" />
+                                    <chartPrmtvs:EdgePanel x:Name="ChartArea" Style="{TemplateBinding ChartAreaStyle}">
+                                        <Grid Canvas.ZIndex="-1" Style="{TemplateBinding PlotAreaStyle}" />
+                                        <Border Canvas.ZIndex="10" BorderBrush="#FF919191" BorderThickness="1" />
+                                    </chartPrmtvs:EdgePanel>
+                                </Grid>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Grid.Resources>
+
+        <ListView Width="70" Height="100" HorizontalAlignment="Left" Margin="5,17,0,0" Name="listViewComChannels" VerticalAlignment="Top" SelectionMode="Single" SelectionChanged="listViewComChannels_SelectionChanged" >
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="DarkGreen" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="{Binding}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Label Content="Com channels" Height="12" Padding="0,0,0,0" HorizontalAlignment="Left" Margin="5,5,0,0" Name="label1" VerticalAlignment="Top" Width="78" />
+        <Label Content="Photo" Height="12" Padding="0,0,0,0" HorizontalAlignment="Left" Margin="83,2,0,0" Name="label4" VerticalAlignment="Top" Width="32" Foreground="Blue" Background="LightGray"/>
+
+        <Label Name="label5" Content="Sensors" Height="12" Padding="0,0,0,0" HorizontalAlignment="Left" Margin="139,5,0,0" VerticalAlignment="Top" Width="38" />
+        <Label Name="label6" Content="Devices" Height="12" Padding="0,0,0,0" HorizontalAlignment="Left" Margin="356,5,0,0" VerticalAlignment="Top" Width="73" />
+
+        <Label Content="Input from selected channel" Height="12" Padding="0,0,0,0" HorizontalAlignment="Left" Margin="1430,5,0,0" Name="label2" VerticalAlignment="Top" Width="146" />
+        <ListBox Name="listBoxLogs" Height="805" Width="385" Margin="1290,17,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.RowSpan="1"/>
+
+        <DataGrid AutoGenerateColumns="False" Width="170" Height="100" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="80,17,0,0" Name="dataGridPhotoSensors" CanUserResizeRows="False" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn CanUserReorder="False" Header="Reading" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Reading}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Pin" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Pin}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Idx" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Array_index}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Timestamp" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Time_stamp, Converter={StaticResource dateTimeConverter}}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <DataGrid AutoGenerateColumns="False" Width="300" Height="100" HorizontalAlignment="Left" Margin="256,17,0,0" Name="dataGridPhotoDevices" VerticalAlignment="Top" CanUserResizeRows="False" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn CanUserReorder="False" Header="State" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Current_state, Converter={StaticResource ResourceKey=onOfConverter}, ConverterParameter=state}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Pin" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Output_pin}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Idx" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Array_index}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Pht Snsr Idx" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Photo_sensor_array_index}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Switch" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Switch_reading}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Day" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Day_time_state_on, Converter={StaticResource ResourceKey=onOfConverter}, ConverterParameter=state}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Timestamp" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Time_stamp, Converter={StaticResource dateTimeConverter}}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <DataGrid AutoGenerateColumns="False" Width="340" Height="130" HorizontalAlignment="Left" Margin="5,145,0,0" Name="dataGridTempSensors" VerticalAlignment="Top" CanUserResizeRows="False" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn CanUserReorder="False" Header="Reading" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Reading, Converter={StaticResource doubleConverterFixedTwo}, ConverterParameter=2}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Pin" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Pin}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Idx" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Array_index}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Max" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Max_expected, Converter={StaticResource doubleConverterFixedTwo}, ConverterParameter=2}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Min" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Min_expected, Converter={StaticResource doubleConverterFixedTwo}, ConverterParameter=2}" />
+                <DataGridTextColumn CanUserReorder="False" Header="State" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Error_state, Converter={StaticResource ResourceKey=stateConverter}, ConverterParameter=error_state}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Errors" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Error_count}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Offset" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Temp_offset, Converter={StaticResource doubleConverterFixedTwo}, ConverterParameter=1}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Timestamp" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Time_stamp, Converter={StaticResource dateTimeConverter}}" />
+            </DataGrid.Columns>
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderThickness" Value="2"></Setter>
+                </Style>
+            </DataGrid.CellStyle>
+        </DataGrid>
+
+        <DataGrid AutoGenerateColumns="False" Width="660" Height="130" Margin="350,145,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="dataGridTempDevices" CanUserResizeRows="False" CanUserAddRows="False" >
+            <DataGrid.Columns>
+                <DataGridTextColumn CanUserReorder="False" Header="State" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Current_state, Converter={StaticResource ResourceKey=onOfConverter}, ConverterParameter=state}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Pin" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Output_pin}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Idx" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Array_index}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Tmp Snsr Idx" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Temp_sensor_array_index}" />
+                <DataGridTextColumn CanUserReorder="False" Header="On When Tmp" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Temp_sensor_state_when_on, Converter={StaticResource stateConverter}, ConverterParameter=state}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Tmp Reading" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Sensor_reading}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Tmp Range" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Temp_range, Converter={StaticResource doubleConverterFixedTwo}, ConverterParameter=2}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Day" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Day_time_switch_temp, Converter={StaticResource doubleConverterFixedTwo}, ConverterParameter=2}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Night" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Night_time_switch_temp, Converter={StaticResource doubleConverterFixedTwo}, ConverterParameter=2}" />
+                <DataGridTextColumn CanUserReorder="False" Header="On Tmp Snsr Error State" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding State_on_sensor_error, Converter={StaticResource stateConverter}, ConverterParameter=on_error_state}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Pht Snsr Switch" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Photo_sensor_switch_reading}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Pht Snsr Idx" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Photo_sensor_array_index}" />
+                <DataGridTextColumn CanUserReorder="False" Header="Timestamp" IsReadOnly="True" HeaderStringFormat="Header" SortDirection="Ascending" Binding="{Binding Time_stamp, Converter={StaticResource dateTimeConverter}}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Label Name="label3" Content="Temperature" Margin="10,129,0,0" Width="57" Height="12" Padding="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="Blue" Background="LightGray" />
+        <Label Name="label8" Content="Sensors" Margin="120,133,0,0" Width="38" Height="12" Padding="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+        <Label Name="label7" Content="Devices" Margin="640,133,0,0" Width="73" Height="12" Padding="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+
+        <charting:Chart Name="tempSensorsChart" Margin="5,290,0,0" Height="400" Width="1260" Background="LightGray" Foreground="DarkBlue" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="True" >
+            <charting:ScatterSeries Title="Sensor 1"
+                 Name="scatterChartSeries"
+                 ItemsSource="{Binding}" 
+                 DependentValueBinding="{Binding Value}" 
+                 IndependentValueBinding="{Binding Key}"
+                 IsSelectionEnabled="True">
+                <charting:ScatterSeries.DataPointStyle>
+                    <Style TargetType="charting:ScatterDataPoint">
+                        <Setter Property="Height" Value="1.0"/>
+                        <Setter Property="Width" Value="3.0"/>
+                        <Setter Property="Foreground" Value="Blue"></Setter>
+                        <Setter Property="Background" Value="Blue"></Setter>
+                        <Setter Property="BorderBrush" Value="Blue"></Setter>
+                        <Setter Property="Opacity" Value="1.0"></Setter>
+                    </Style>
+                </charting:ScatterSeries.DataPointStyle>
+
+                <charting:ScatterSeries.IndependentAxis>
+                    <charting:DateTimeAxis Orientation="X" Title="Time (Hour)" ShowGridLines="True" IntervalType="Minutes" Interval="15" GridLineStyle="{StaticResource gridLineStyle}" >
+                        <charting:DateTimeAxis.AxisLabelStyle>
+                            <Style TargetType="charting:DateTimeAxisLabel">
+                                <Setter Property="StringFormat" Value="{}{0:HH:mm}"/>
+                            </Style>
+                        </charting:DateTimeAxis.AxisLabelStyle>
+                    </charting:DateTimeAxis>
+                </charting:ScatterSeries.IndependentAxis>
+
+                <charting:ScatterSeries.DependentRangeAxis>
+                    <charting:LinearAxis Orientation="Y" Title="Temp (C)" ShowGridLines="True" Interval="1" GridLineStyle="{StaticResource gridLineStyle}" >
+                    </charting:LinearAxis>
+                </charting:ScatterSeries.DependentRangeAxis>
+            </charting:ScatterSeries>
+        </charting:Chart>
+
+        <charting:Chart Name="tempDevicesChart" Width="1260" Background="LightGray" Foreground="DarkBlue" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,700,0,0" Height="125" IsEnabled="True" >
+            <charting:LineSeries Title="Device 1"
+                 Name="lineChartSeries"
+                 ItemsSource="{Binding}" 
+                 DependentValueBinding="{Binding Value}" 
+                 IndependentValueBinding="{Binding Key}"
+                 PolylineStyle="{StaticResource ResourceKey=polyLineStyle}"
+                 IsSelectionEnabled="True">
+                <charting:LineSeries.DataPointStyle>
+                    <Style TargetType="charting:LineDataPoint">
+                        <Setter Property="Width" Value="3.0"/>
+                        <Setter Property="Height" Value="3.0"/>
+                        <Setter Property="Foreground" Value="Blue"></Setter>
+                        <Setter Property="Background" Value="Blue"></Setter>
+                        <Setter Property="BorderBrush" Value="Blue"></Setter>
+                        <Setter Property="Opacity" Value="1.0"></Setter>
+                    </Style>
+                </charting:LineSeries.DataPointStyle>
+
+                <charting:LineSeries.IndependentAxis>
+                    <charting:DateTimeAxis Orientation="X" Title="Time (Hour)" ShowGridLines="True" IntervalType="Minutes" Interval="15" GridLineStyle="{StaticResource gridLineStyle}" >
+                        <charting:DateTimeAxis.AxisLabelStyle>
+                            <Style TargetType="charting:DateTimeAxisLabel">
+                                <Setter Property="StringFormat" Value="{}{0:HH:mm}"/>
+                            </Style>
+                        </charting:DateTimeAxis.AxisLabelStyle>
+                    </charting:DateTimeAxis>
+                </charting:LineSeries.IndependentAxis>
+
+                <charting:LineSeries.DependentRangeAxis>
+                    <charting:LinearAxis Orientation="Y" Title="State" ShowGridLines="True" Minimum="0" Maximum="2" Interval="1" GridLineStyle="{StaticResource gridLineStyle}" >
+                    </charting:LinearAxis>
+                </charting:LineSeries.DependentRangeAxis>
+            </charting:LineSeries>
+        </charting:Chart>
+    </Grid>
+</Window>
