@@ -89,8 +89,10 @@ namespace TerrariumThermostat {
         /// </summary>
         public abstract class NotifyPropertyChanged : INotifyPropertyChanged {
             public event PropertyChangedEventHandler PropertyChanged;
-            protected void Changed(string s) {
-                if (PropertyChanged != null) {
+            protected void Changed(string s)
+            {
+                if (PropertyChanged != null)
+                {
                     PropertyChanged(this, new PropertyChangedEventArgs(s));
                 }
             }
@@ -104,8 +106,10 @@ namespace TerrariumThermostat {
             private int _maxChartY;
             public int MaxChartY {
                 get { return _maxChartY; }
-                set {
-                    if (value > _minChartY) {
+                set
+                {
+                    if (value > _minChartY)
+                    {
                         _maxChartY = value; Changed("MaxChartY");
                     }
                 }
@@ -114,8 +118,10 @@ namespace TerrariumThermostat {
             private int _minChartY;
             public int MinChartY {
                 get { return _minChartY; }
-                set {
-                    if (value < _maxChartY) {
+                set
+                {
+                    if (value < _maxChartY)
+                    {
                         _minChartY = value; Changed("MinChartY");
                     }
                 }
@@ -123,10 +129,12 @@ namespace TerrariumThermostat {
         }
 
         public class TempSensor : NotifyPropertyChanged {
-            public TempSensor() {
+            public TempSensor()
+            {
             }
 
-            public TempSensor(int pin, float reading, float maxExpected, float minExpected, int errorState, uint errorCount, int arrayIndex, float tempOffset) {
+            public TempSensor(int pin, float reading, float maxExpected, float minExpected, int errorState, uint errorCount, int arrayIndex, float tempOffset)
+            {
                 _pin = pin;
                 _reading = reading;
                 _max_expected = maxExpected;
@@ -193,7 +201,8 @@ namespace TerrariumThermostat {
         }
 
         public class PhotoSensor : NotifyPropertyChanged {
-            public PhotoSensor() {
+            public PhotoSensor()
+            {
             }
 
             private int _pin; // use for key
@@ -222,7 +231,8 @@ namespace TerrariumThermostat {
         }
 
         public class TempControlledDevice : NotifyPropertyChanged {
-            public TempControlledDevice() {
+            public TempControlledDevice()
+            {
             }
 
             private int _array_index;
@@ -305,7 +315,8 @@ namespace TerrariumThermostat {
         }
 
         public class PhotoControlledDevice : NotifyPropertyChanged {
-            public PhotoControlledDevice() {
+            public PhotoControlledDevice()
+            {
             }
 
             private int _array_index;
@@ -369,7 +380,8 @@ namespace TerrariumThermostat {
             ///http://stackoverflow.com/questions/5278860/using-wmi-to-identify-which-device-caused-a-win32-devicechangeevent
             ///http://stackoverflow.com/questions/9467707/dont-get-instanceoperationevent-when-disablingqenabling-some-devices
             /// </summary>
-            public UsbEventListener() {
+            public UsbEventListener()
+            {
 
                 WqlEventQuery _query;
                 _insertWatcher = new ManagementEventWatcher();
@@ -389,37 +401,51 @@ namespace TerrariumThermostat {
                 _removalWatcher.EventArrived += _watcher_DisconnectEventArrived;
             }
 
-            public void Stop() {
-                try {
+            public void Stop()
+            {
+                try
+                {
                     _insertWatcher.Stop();
                     _removalWatcher.Stop();
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Logger.Log(ex);
                 }
             }
 
-            private void _watcher_DisconnectEventArrived(object sender, EventArrivedEventArgs e) {
-                try {
-                    if (UsbConnectEventArrived == null) {
+            private void _watcher_DisconnectEventArrived(object sender, EventArrivedEventArgs e)
+            {
+                try
+                {
+                    if (UsbConnectEventArrived == null)
+                    {
                         return;
                     }
 
                     ManagementBaseObject mo = (ManagementBaseObject)e.NewEvent["TargetInstance"];
                     UsbConnectEventArrived(EventType.Disconnect, mo.Properties["DeviceID"].Value.ToString());
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Logger.Log(ex, null);
                 }
             }
 
-            private void _watcher_ConnectEventArrived(object sender, EventArrivedEventArgs e) {
-                try {
-                    if (UsbConnectEventArrived == null) {
+            private void _watcher_ConnectEventArrived(object sender, EventArrivedEventArgs e)
+            {
+                try
+                {
+                    if (UsbConnectEventArrived == null)
+                    {
                         return;
                     }
 
                     ManagementBaseObject mo = (ManagementBaseObject)e.NewEvent["TargetInstance"];
                     UsbConnectEventArrived(EventType.Connect, mo.Properties["DeviceID"].Value.ToString());
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Logger.Log(ex, null);
                 }
             }
@@ -446,21 +472,28 @@ namespace TerrariumThermostat {
             ///  Constructor taking a SerialPort
             /// </summary>
             /// <param name="port"></param>
-            public ComPort(SerialPort port) {
+            public ComPort(SerialPort port)
+            {
                 _serPort = port;
             }
 
-            public void Disconnect() {
-                if (_serPort == null) {
+            public void Disconnect()
+            {
+                if (_serPort == null)
+                {
                     return;
                 }
-                try {
+                try
+                {
                     _serPort.DataReceived -= DataReceivedHandler;
-                    if (SerialPort.GetPortNames().Contains(_serPort.PortName) && _serPort.IsOpen && !_serPort.BreakState) {
+                    if (SerialPort.GetPortNames().Contains(_serPort.PortName) && _serPort.IsOpen && !_serPort.BreakState)
+                    {
                         _serPort.Close();
                         _serPort.Dispose();
                     }
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Logger.Log(ex, "Warning: SerialPort internal error, calling SerialPort.Close() seems to work for dropped connections, but throws an exception");
                 }
             }
@@ -469,8 +502,10 @@ namespace TerrariumThermostat {
             /// Attempts to the internal SerialPort
             /// Assigns an event handler on DataReceived (DataReceivedHanderl)
             /// </summary>
-            public void Connect() {
-                try {
+            public void Connect()
+            {
+                try
+                {
                     string[] ports = SerialPort.GetPortNames();
 
                     Disconnect();
@@ -478,26 +513,34 @@ namespace TerrariumThermostat {
                     _serPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
                     _serPort.ErrorReceived += _serPort_ErrorReceived;
                     _serPort.PinChanged += _serPort_PinChanged;
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Logger.Log(ex);
                 }
                 int failedAttemptsToOpen = 0;
 
-                while (!_serPort.IsOpen && failedAttemptsToOpen < 13) {
-                    try {
+                while (!_serPort.IsOpen && failedAttemptsToOpen < 13)
+                {
+                    try
+                    {
                         _serPort.Open();
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         ++failedAttemptsToOpen;
                         Logger.Log(ex, "Attempt " + failedAttemptsToOpen + " of 13");
                     }
                 }
             }
 
-            void _serPort_PinChanged(object sender, SerialPinChangedEventArgs e) {
+            void _serPort_PinChanged(object sender, SerialPinChangedEventArgs e)
+            {
                 Logger.Log(null, "Handle this event: _serPort_PinChanged.");
             }
 
-            void _serPort_ErrorReceived(object sender, SerialErrorReceivedEventArgs e) {
+            void _serPort_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+            {
                 Logger.Log(null, "Handle this event: _serPort_ErrorReceived.");
             }
 
@@ -505,7 +548,8 @@ namespace TerrariumThermostat {
             /// 
             /// </summary>
             /// <returns></returns>
-            public override string ToString() {
+            public override string ToString()
+            {
                 return _serPort.PortName;
             }
 
@@ -525,7 +569,8 @@ namespace TerrariumThermostat {
             /// </summary>
             /// <param name="sender"></param>
             /// <param name="e"></param>
-            private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e) {
+            private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
+            {
                 SerialPort sp = (SerialPort)sender;
                 if (!sp.Equals(MainWindow._comPorts[sp.PortName].SerPort))// _selectedComPort.SerPort))
                 {
@@ -535,28 +580,35 @@ namespace TerrariumThermostat {
 
                 string indata = sp.ReadExisting();
                 _buffer += indata;
-                while (HasMessage()) {
-                    if (OnMessageReceived != null) {
+                while (HasMessage())
+                {
+                    if (OnMessageReceived != null)
+                    {
                         OnMessageReceived(this, _message);
                     }
                 }
             }
 
-            private bool HasMessage() {
+            private bool HasMessage()
+            {
                 _message = String.Empty;
                 bool ret = false;
 
 
                 if (_buffer.Contains("\r\n")) // delimiter is end of line, ends up with Windows style end of line
                 {
-                    try {
+                    try
+                    {
                         _message = _buffer.Substring(0, _buffer.IndexOf("\r\n"));
                         _buffer = _buffer.Substring(_buffer.IndexOf("\r\n") + 2);
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         Logger.Log(ex, "Failed to parse JSON");
                     }
                 }
-                if (_message != String.Empty) {
+                if (_message != String.Empty)
+                {
                     ret = true;
                 }
                 return ret;
@@ -607,8 +659,10 @@ namespace TerrariumThermostat {
         /// <summary>
         /// MainWindow setup and initialization.
         /// </summary>
-        public MainWindow() {
-            try {
+        public MainWindow()
+        {
+            try
+            {
                 SetupDefaults();
                 _chartColors.Add(Colors.Blue); // fixed in .xaml
                 _chartColors.Add(Colors.Green);
@@ -638,7 +692,8 @@ namespace TerrariumThermostat {
                 dataGridTempDevices.ItemsSource = TempControlledDevices;
                 dataGridPhotoDevices.ItemsSource = PhotoControlledDevices;
 
-                foreach (string port in ports) {
+                foreach (string port in ports)
+                {
                     ComPort newPort = new ComPort(new SerialPort(port));
                     _comPorts.Add(port, newPort);
                     listViewComChannels.Items.Add(port);
@@ -667,59 +722,83 @@ namespace TerrariumThermostat {
                 TempSensorsHistory.CollectionChanged += TempSensorsHistory_CollectionChanged;
                 TempDevicesHistory.CollectionChanged += TempDevicesHistory_CollectionChanged;
                 this.Closing += new CancelEventHandler(MainWindow_Closing);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Logger.Log(ex);
                 // TODO show message to user
                 this.Close();
             }
         }
 
-        private void TempDevicesHistory_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        private void TempDevicesHistory_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
             //Messages.Add("TempDevicesHistory_CollectionChanged invoked");
-            if (e.NewStartingIndex != 0) {
+            if (e.NewStartingIndex != 0)
+            {
                 TempDeviceLineChartAdd(); // first chart coded in .xaml
             }
 
             ((LineSeries)tempDevicesChart.Series[e.NewStartingIndex]).ItemsSource = TempDevicesHistory[e.NewStartingIndex];
         }
 
-        private void TempSensorsHistory_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        private void TempSensorsHistory_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
             //Messages.Add("TempSensorsHistory_CollectionChanged invoked");
-            if (e.NewStartingIndex != 0) {
+            if (e.NewStartingIndex != 0)
+            {
                 TempSensorScatterChartAdd(); // first chart coded in .xaml
             }
 
             ((ScatterSeries)tempSensorsChart.Series[e.NewStartingIndex]).ItemsSource = TempSensorsHistory[e.NewStartingIndex];
         }
 
-        private void UpdateAvailableComChannels(UsbEventListener.EventType type, string port) {
-            try {
-                if (type == UsbEventListener.EventType.Connect) {
+        private void UpdateAvailableComChannels(UsbEventListener.EventType type, string port)
+        {
+            try
+            {
+                if (type == UsbEventListener.EventType.Connect)
+                {
                     ComPort newPort = new ComPort(new SerialPort(port));
-                    if (!_comPorts.ContainsKey(port)) {
-                        if (!_comPorts.ContainsKey(port)) {
+                    if (!_comPorts.ContainsKey(port))
+                    {
+                        if (!_comPorts.ContainsKey(port))
+                        {
                             _comPorts.Add(port, newPort);
                         }
-                    } else {
+                    }
+                    else
+                    {
                         //   _comPorts[port] = newPort;
                     }
                     listViewComChannels.Items.Add(port);
-                } else {
-                    if (!_comPorts.ContainsKey(port)) {
+                }
+                else
+                {
+                    if (!_comPorts.ContainsKey(port))
+                    {
                         return;
                     }
 
                     ItemCollection items = listViewComChannels.Items;
-                    for (int i = 0; i < items.Count; ++i) {
+                    for (int i = 0; i < items.Count; ++i)
+                    {
                         string it = (string)items[i];
-                        if (it == port) {
-                            try {
-                                if (it == _comPorts[_selectedComPort].SerPort.PortName) {
+                        if (it == port)
+                        {
+                            try
+                            {
+                                if (it == _comPorts[_selectedComPort].SerPort.PortName)
+                                {
                                     _comPorts[_selectedComPort].Disconnect();
-                                } else {
+                                }
+                                else
+                                {
                                     _comPorts[port].Disconnect();
                                 }
-                            } catch (Exception ex) {
+                            }
+                            catch (Exception ex)
+                            {
                                 Logger.Log(ex);
                             }
 
@@ -728,22 +807,29 @@ namespace TerrariumThermostat {
                         }
                     }
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Logger.Log(ex);
             }
         }
 
-        private void usbEventListener_UsbConnectEventArrived(UsbEventListener.EventType type, string port) {
+        private void usbEventListener_UsbConnectEventArrived(UsbEventListener.EventType type, string port)
+        {
             Invoke(() => UpdateAvailableComChannels(type, port));
         }
 
-        private void listViewComChannels_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            try {
+        private void listViewComChannels_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
                 ListView lv = (ListView)sender;
-                if (lv == null || lv.SelectedIndex < 0) {
+                if (lv == null || lv.SelectedIndex < 0)
+                {
                     return;
                 }
-                if (_selectedComPort != null && _comPorts[_selectedComPort] != null) {
+                if (_selectedComPort != null && _comPorts[_selectedComPort] != null)
+                {
                     _comPorts[_selectedComPort].Disconnect();
                 }
 
@@ -759,7 +845,8 @@ namespace TerrariumThermostat {
                 TempSensorsHistory = new ObservableCollection<ObservableCollection<KeyValuePair<DateTime, double>>>();
                 TempSensorsHistory.CollectionChanged += TempSensorsHistory_CollectionChanged;
                 int seriesCount = tempSensorsChart.Series.Count;
-                for (int i = 1; i < seriesCount; ++i) {
+                for (int i = 1; i < seriesCount; ++i)
+                {
                     ISeries s = tempSensorsChart.Series[1];
                     tempSensorsChart.Series.Remove(s);
                 }
@@ -767,7 +854,8 @@ namespace TerrariumThermostat {
                 TempDevicesHistory = new ObservableCollection<ObservableCollection<KeyValuePair<DateTime, int>>>();
                 TempDevicesHistory.CollectionChanged += TempDevicesHistory_CollectionChanged;
                 seriesCount = tempDevicesChart.Series.Count;
-                for (int i = 1; i < seriesCount; ++i) {
+                for (int i = 1; i < seriesCount; ++i)
+                {
                     ISeries s = tempDevicesChart.Series[1];
                     tempDevicesChart.Series.Remove(s);
                 }
@@ -781,7 +869,9 @@ namespace TerrariumThermostat {
                 _comPorts[_selectedComPort].OnMessageReceived -= _selectedComPort_OnMessageReceived;
                 _comPorts[_selectedComPort].OnMessageReceived += new ComPort.MessageReceivedHandler(_selectedComPort_OnMessageReceived);
                 _comPorts[_selectedComPort].Connect();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Logger.Log(ex);
             }
         }
@@ -791,20 +881,26 @@ namespace TerrariumThermostat {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void dataGridTempDevices_LoadingRow(object sender, DataGridRowEventArgs e) {
+        private void dataGridTempDevices_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
             DataGridRow row = e.Row as DataGridRow;
-            if (dataGridTempDevices.Columns[0].GetCellContent(row) == null) {
+            if (dataGridTempDevices.Columns[0].GetCellContent(row) == null)
+            {
                 return;
             }
             DataGridCell cellState = dataGridTempDevices.Columns[0].GetCellContent(row).Parent as DataGridCell;
-            if (cellState != null) { // assume all cells are available if the first one is.
+            if (cellState != null)
+            { // assume all cells are available if the first one is.
                 DataGridCell cellDeviceIdx = dataGridTempDevices.Columns[2].GetCellContent(row).Parent as DataGridCell;
                 Int32.TryParse(((TextBlock)cellDeviceIdx.Content).Text, out int deviceIdx);
 
                 #region Set On/Off indicator cell
-                if (TempControlledDevices[deviceIdx].Current_state) {
+                if (TempControlledDevices[deviceIdx].Current_state)
+                {
                     cellState.Background = new SolidColorBrush(ON_COLOR);
-                } else {
+                }
+                else
+                {
                     cellState.Background = new SolidColorBrush(OFF_COLOR);
 
                 }
@@ -824,15 +920,22 @@ namespace TerrariumThermostat {
                 #endregion
 
                 #region Set Error State indicator cell
-                if (TemperatureSensors.Count > TempControlledDevices[deviceIdx].Temp_sensor_array_index) {
+                if (TemperatureSensors.Count > TempControlledDevices[deviceIdx].Temp_sensor_array_index)
+                {
                     DataGridCell cellErrorState = dataGridTempDevices.Columns[9].GetCellContent(row).Parent as DataGridCell;
-                    if (TemperatureSensors[TempControlledDevices[deviceIdx].Temp_sensor_array_index].Error_state != 0) {
-                        if (TempControlledDevices[deviceIdx].State_on_sensor_error == 1) {
+                    if (TemperatureSensors[TempControlledDevices[deviceIdx].Temp_sensor_array_index].Error_state != 0)
+                    {
+                        if (TempControlledDevices[deviceIdx].State_on_sensor_error == 1)
+                        {
                             cellErrorState.Background = new SolidColorBrush(ON_COLOR);
-                        } else {
+                        }
+                        else
+                        {
                             cellErrorState.Background = new SolidColorBrush(OFF_COLOR);
                         }
-                    } else {
+                    }
+                    else
+                    {
                         DataGridCell cellTimeStamp = dataGridTempDevices.Columns[12].GetCellContent(row).Parent as DataGridCell;
                         cellErrorState.Background = cellTimeStamp.Background;
                     }
@@ -850,14 +953,17 @@ namespace TerrariumThermostat {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void dataGridTempSensors_LoadingRow(object sender, DataGridRowEventArgs e) {
+        private void dataGridTempSensors_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
             DataGridRow row = e.Row as DataGridRow;
-            if (dataGridTempSensors.Columns[0].GetCellContent(row) == null) {
+            if (dataGridTempSensors.Columns[0].GetCellContent(row) == null)
+            {
                 return;
             }
 
             DataGridCell cell = dataGridTempSensors.Columns[0].GetCellContent(row).Parent as DataGridCell;
-            if (cell != null) {
+            if (cell != null)
+            {
                 DataGridCell cellMax = dataGridTempSensors.Columns[4].GetCellContent(row).Parent as DataGridCell;
                 DataGridCell cellMin = dataGridTempSensors.Columns[3].GetCellContent(row).Parent as DataGridCell;
                 DataGridCell cellTimeStamp = dataGridTempSensors.Columns[8].GetCellContent(row).Parent as DataGridCell;
@@ -865,15 +971,21 @@ namespace TerrariumThermostat {
 
                 Int32.TryParse(((TextBlock)cellArrayIdx.Content).Text, out int tempSensorIdx);
                 #region set Error State indicator cell
-                if (TemperatureSensors[tempSensorIdx].Error_state != 0) {
+                if (TemperatureSensors[tempSensorIdx].Error_state != 0)
+                {
                     cell.Background = new SolidColorBrush(ERROR_COLOR);
 
-                    if (TemperatureSensors[tempSensorIdx].Reading >= TemperatureSensors[tempSensorIdx].Max_expected) {
+                    if (TemperatureSensors[tempSensorIdx].Reading >= TemperatureSensors[tempSensorIdx].Max_expected)
+                    {
                         cellMin.Background = new SolidColorBrush(ERROR_COLOR);
-                    } else {
+                    }
+                    else
+                    {
                         cellMax.Background = new SolidColorBrush(ERROR_COLOR);
                     }
-                } else {
+                }
+                else
+                {
                     cell.Background = cellTimeStamp.Background;
                     cellMax.Background = cellTimeStamp.Background;
                     cellMin.Background = cellTimeStamp.Background;
@@ -889,20 +1001,27 @@ namespace TerrariumThermostat {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void dataGridPhotoDevices_LoadingRow(object sender, DataGridRowEventArgs e) {
+        private void dataGridPhotoDevices_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
             DataGridRow row = e.Row as DataGridRow;
-            if (dataGridPhotoDevices.Columns[0].GetCellContent(row) == null) {
+            if (dataGridPhotoDevices.Columns[0].GetCellContent(row) == null)
+            {
                 return;
             }
             DataGridCell cellState = dataGridPhotoDevices.Columns[0].GetCellContent(row).Parent as DataGridCell;
-            if (cellState != null) { // assume all cells are available if the first one is.
+            if (cellState != null)
+            { // assume all cells are available if the first one is.
                 DataGridCell cellArrayIdx = dataGridTempDevices.Columns[2].GetCellContent(row).Parent as DataGridCell;
-                if (Int32.TryParse(((TextBlock)cellArrayIdx.Content).Text, out int deviceIdx)) {
+                if (Int32.TryParse(((TextBlock)cellArrayIdx.Content).Text, out int deviceIdx))
+                {
 
                     #region Set On/Off indicator cell
-                    if (PhotoControlledDevices[deviceIdx].Current_state) {
+                    if (PhotoControlledDevices[deviceIdx].Current_state)
+                    {
                         cellState.Background = new SolidColorBrush(ON_COLOR);
-                    } else {
+                    }
+                    else
+                    {
                         cellState.Background = new SolidColorBrush(OFF_COLOR);
 
                     }
@@ -915,7 +1034,8 @@ namespace TerrariumThermostat {
 
                 #region Set Photo Sensor index indicator cell
                 DataGridCell cellPhtSnsrIdx = dataGridPhotoDevices.Columns[3].GetCellContent(row).Parent as DataGridCell;
-                if (Int32.TryParse(((TextBlock)cellPhtSnsrIdx.Content).Text, out int photoSensorIdx)) {
+                if (Int32.TryParse(((TextBlock)cellPhtSnsrIdx.Content).Text, out int photoSensorIdx))
+                {
                     cellPhtSnsrIdx.BorderBrush = new SolidColorBrush(GetChartColor(photoSensorIdx));
                 }
                 #endregion
@@ -927,14 +1047,17 @@ namespace TerrariumThermostat {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void dataGridPhotoSensors_LoadingRow(object sender, DataGridRowEventArgs e) {
+        private void dataGridPhotoSensors_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
             DataGridRow row = e.Row as DataGridRow;
-            if (dataGridPhotoSensors.Columns[0].GetCellContent(row) == null) {
+            if (dataGridPhotoSensors.Columns[0].GetCellContent(row) == null)
+            {
                 return;
             }
             DataGridCell cellReading = dataGridPhotoSensors.Columns[0].GetCellContent(row).Parent as DataGridCell;
 
-            if (cellReading != null) {
+            if (cellReading != null)
+            {
                 #region Set Photo Sensor index indicator cell
                 DataGridCell cellArrayIdx = dataGridTempDevices.Columns[2].GetCellContent(row).Parent as DataGridCell;
                 int arrayIdx;
@@ -949,50 +1072,68 @@ namespace TerrariumThermostat {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MainWindow_Closing(object sender, CancelEventArgs e) {
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
             // Make sure to null Self on window close.  Cross-thread events will hang otherwise
-            try {
+            try
+            {
                 _usbEventListener.Stop(); // this SEEMS to work, another solution not needed, micro-manage RCW easier at this time, violates separation of concerns 
                                           //Refer here http://stackoverflow.com/questions/2085972/release-excel-object-in-my-destructor for another solution to prevent micro-managing and violations to sepearation of concerns
 
                 //http://msdn.microsoft.com/en-us/library/system.io.ports.serialport.cdholding(v=vs.110).aspx
                 //http://msdn.microsoft.com/en-us/library/system.io.ports.serialport.breakstate(v=vs.110).aspx
-                if (_selectedComPort != null && _comPorts[_selectedComPort] != null) {
+                if (_selectedComPort != null && _comPorts[_selectedComPort] != null)
+                {
                     _comPorts[_selectedComPort].Disconnect();
                     _comPorts[_selectedComPort] = null;
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Logger.Log(ex);
             }
         }
 
 
 
-        private Color GetChartColor(int chartColorIdx) {
+        private Color GetChartColor(int chartColorIdx)
+        {
             return _chartColors[chartColorIdx % _chartColorsCount];
         }
 
-        private TimeSpan GetChartOffset(DateTime first, DateTime last) {
+        private TimeSpan GetChartOffset(DateTime first, DateTime last)
+        {
             TimeSpan r = last - first;
             TimeSpan range = new TimeSpan(r.Hours, r.Minutes, 0);
 
-            if (range < _minChartRangeX) {
+            if (range < _minChartRangeX)
+            {
                 return _minChartRangeX;
             }
 
             return range;
         }
 
-        private double GetChartInterval_X(double minutes) {
-            if (minutes < 240) {
+        private double GetChartInterval_X(double minutes)
+        {
+            if (minutes < 240)
+            {
                 return 15;
-            } else if (minutes < 300) {
+            }
+            else if (minutes < 300)
+            {
                 return 30;
-            } else if (minutes < 420) {
+            }
+            else if (minutes < 420)
+            {
                 return 45;
-            } else if (minutes < 720) {
+            }
+            else if (minutes < 720)
+            {
                 return 60;
-            } else if (minutes < 1080) {
+            }
+            else if (minutes < 1080)
+            {
                 return 90;
             }
             return 120;
@@ -1000,30 +1141,42 @@ namespace TerrariumThermostat {
 
 
 
-        private void TempDeviceAddReading(TempControlledDevice tempDevice) {
+        private void TempDeviceAddReading(TempControlledDevice tempDevice)
+        {
             #region update chart
-            try {
+            try
+            {
                 int tdIdx = tempDevice.Array_index;
-                lock (TempControlledDevices) {
-                    lock (TempDevicesHistory) {
-                        if (TempControlledDevices.Count > tempDevice.Array_index) { // update already existing Temp Device
-                                                                                    //Messages.Add("Updating TempDevice[" + tempDevice.Array_index + "].Count: " + tdhCnt);
+                lock (TempControlledDevices)
+                {
+                    lock (TempDevicesHistory)
+                    {
+                        if (TempControlledDevices.Count > tempDevice.Array_index)
+                        { // update already existing Temp Device
+                          //Messages.Add("Updating TempDevice[" + tempDevice.Array_index + "].Count: " + tdhCnt);
                             TempControlledDevices[tdIdx] = tempDevice;
-                        } else if (TempControlledDevices.Count == tempDevice.Array_index) { // This is a new Temp Device
-                                                                                            //Messages.Add("Adding new TempDevice[" + tempDevice.Array_index + "]");
+                        }
+                        else if (TempControlledDevices.Count == tempDevice.Array_index)
+                        { // This is a new Temp Device
+                          //Messages.Add("Adding new TempDevice[" + tempDevice.Array_index + "]");
                             TempControlledDevices.Add(tempDevice);
-                        } else {
+                        }
+                        else
+                        {
                             return; // Devices may come in out of order. First reading may be missed.
                         }
 
                         int onStateIdx = tempDevice.Current_state == true ? tempDevice.Array_index + 1 : 0; // Y-Axis plot point
                         KeyValuePair<DateTime, int> newHistory = new KeyValuePair<DateTime, int>(tempDevice.Time_stamp, onStateIdx);
-                        if (TempDevicesHistory.Count > tempDevice.Array_index) { // update already existing Temp Device
+                        if (TempDevicesHistory.Count > tempDevice.Array_index)
+                        { // update already existing Temp Device
                             int tdhCnt = TempDevicesHistory[tdIdx].Count();
                             //Messages.Add("Updating TempDevicesHistory[" + tempDevice.Array_index + "].Count: " + tdhCnt);
                             // NOTE: Order of add/removal of items is important (Key is a DateTime), expected to be in order
-                            if (TempDevicesHistory[tdIdx].Last().Value == newHistory.Value) {
-                                if ((tdhCnt > 2 && TempDevicesHistory[tdIdx][tdhCnt - 2].Value == newHistory.Value) || (tdhCnt == 2)) {
+                            if (TempDevicesHistory[tdIdx].Last().Value == newHistory.Value)
+                            {
+                                if ((tdhCnt > 2 && TempDevicesHistory[tdIdx][tdhCnt - 2].Value == newHistory.Value) || (tdhCnt == 2))
+                                {
                                     // On/Off State has NOT changed for the last three readings, remove last item, add the new item
                                     TempDevicesHistory[tdIdx].RemoveAt(tdhCnt - 1);
                                 }
@@ -1037,23 +1190,29 @@ namespace TerrariumThermostat {
 
                             TempDevicesHistory[tdIdx].Add(newHistory);
 
-                            if (TempDevicesHistory[tdIdx].Count() > 3) {
+                            if (TempDevicesHistory[tdIdx].Count() > 3)
+                            {
                                 //Messages.Add("TempDevicesHistory[tdIdx].Count() > 3 -> TempDevicesHistory[" + tempDevice.Array_index + "].Count: " + tdhCnt);
                                 DateTime? chartfirstTime = (DateTime?)tempDevicesChart?.ActualAxes.OfType<DateTimeAxis>().FirstOrDefault(ax => ax.Orientation == AxisOrientation.X).Minimum;
-                                if (chartfirstTime != null && TempDevicesHistory[tdIdx][1].Key < chartfirstTime) {
+                                if (chartfirstTime != null && TempDevicesHistory[tdIdx][1].Key < chartfirstTime)
+                                {
                                     // There are two points off the chart, remove one. // && TempDevicesHistory[tdIdx].ElementAt(0).Key < chartfirstTime 
                                     // Could check to see of there are more, but should not be necessary as the collection is added to one by one.
                                     TempDevicesHistory[tdIdx].RemoveAt(0);
                                 }
                             }
-                        } else if (TempDevicesHistory.Count == tempDevice.Array_index) { // This is a new Temp Device
-                                                                                         //Messages.Add("Adding new TempDevicesHistory[" + tempDevice.Array_index + "], TempDevicesHistory.Count=" + TempDevicesHistory.Count);
+                        }
+                        else if (TempDevicesHistory.Count == tempDevice.Array_index)
+                        { // This is a new Temp Device
+                          //Messages.Add("Adding new TempDevicesHistory[" + tempDevice.Array_index + "], TempDevicesHistory.Count=" + TempDevicesHistory.Count);
                             ObservableCollection<KeyValuePair<DateTime, int>> newHistories = new ObservableCollection<KeyValuePair<DateTime, int>> {
                             newHistory,
                             new KeyValuePair<DateTime, int> (tempDevice.Time_stamp.AddMilliseconds(-1), newHistory.Value) // Line charts appear to require at least 2 points or it locks up the Application window
                         };
                             TempDevicesHistory.Add(newHistories);
-                        } else {
+                        }
+                        else
+                        {
                             // This is a new Device, but has come in out of order, this reading will not be charted.
                             return;
                         }
@@ -1062,20 +1221,26 @@ namespace TerrariumThermostat {
                         //Messages.Add("TempDevicesHistory[" + tempDevice.Array_index + "] first time: " + TempDevicesHistory[tdIdx][0].Key);
                         //Messages.Add("TempDevicesHistory[" + tempDevice.Array_index + "] last time: " + TempDevicesHistory[tdIdx][TempDevicesHistory[tdIdx].Count - 1].Key);
 
-                        if (tempDevice.Array_index == 0) {
+                        if (tempDevice.Array_index == 0)
+                        {
                             TempDeviceChartSetXAxisRange();
                         }
                     }
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Logger.Log(ex, null);
             }
             #endregion
         }
 
-        private void TempDeviceChartSetXAxisRange() {
-            if (_syncChartXAxis == true) {
-                if (TempSensorsHistory.Count == 0 || TempSensorsHistory[0].Count == 0) {
+        private void TempDeviceChartSetXAxisRange()
+        {
+            if (_syncChartXAxis == true)
+            {
+                if (TempSensorsHistory.Count == 0 || TempSensorsHistory[0].Count == 0)
+                {
                     return;
                 }
 
@@ -1093,8 +1258,11 @@ namespace TerrariumThermostat {
                 tempDevicesChart.ActualAxes.OfType<DateTimeAxis>().FirstOrDefault(ax => ax.Orientation == AxisOrientation.X).Maximum = chartLastTime;
                 tempDevicesChart.ActualAxes.OfType<DateTimeAxis>().FirstOrDefault(ax => ax.Orientation == AxisOrientation.X).Minimum = chartFirstTime;
                 tempDevicesChart.ActualAxes.OfType<DateTimeAxis>().FirstOrDefault(ax => ax.Orientation == AxisOrientation.X).Interval = GetChartInterval_X((chartLastTime - chartFirstTime).TotalMinutes);
-            } else { // if (_syncChartXAxis == false) {  // --------------------------------- UNTESTED  ----------------------------------------------------------------------------------------------------------------
-                if (TempDevicesHistory.Count == 0 || TempDevicesHistory[0].Count == 0 || TempSensorsHistory.Count == 0 || TempSensorsHistory[0].Count == 0) {
+            }
+            else
+            { // if (_syncChartXAxis == false) {  // --------------------------------- UNTESTED  ----------------------------------------------------------------------------------------------------------------
+                if (TempDevicesHistory.Count == 0 || TempDevicesHistory[0].Count == 0 || TempSensorsHistory.Count == 0 || TempSensorsHistory[0].Count == 0)
+                {
                     return;
                 }
 
@@ -1114,7 +1282,8 @@ namespace TerrariumThermostat {
             }
         }
 
-        private void TempDeviceLineChartAdd() {
+        private void TempDeviceLineChartAdd()
+        {
             //Messages.Add("TempDeviceLineChartAdd invoked");
             SolidColorBrush brush = new SolidColorBrush(GetChartColor(tempDevicesChart.Series.Count));
 
@@ -1149,16 +1318,24 @@ namespace TerrariumThermostat {
             tempDevicesChart.ActualAxes.OfType<LinearAxis>().FirstOrDefault(ay => ay.Orientation == AxisOrientation.Y).Minimum = 0;
         }
 
-        private void TempSensorAddReading(TempSensor tempSensor) {
+        private void TempSensorAddReading(TempSensor tempSensor)
+        {
             #region update chart
-            lock (TemperatureSensors) {
-                lock (TempSensorsHistory) {
+            lock (TemperatureSensors)
+            {
+                lock (TempSensorsHistory)
+                {
                     // Temperature Sensors Grid data handling
-                    if (TemperatureSensors.Count > tempSensor.Array_index) { // update already existing
+                    if (TemperatureSensors.Count > tempSensor.Array_index)
+                    { // update already existing
                         TemperatureSensors[tempSensor.Array_index] = tempSensor;
-                    } else if (TemperatureSensors.Count - tempSensor.Array_index == 0) { // new insert, Sensors may come in out of order
+                    }
+                    else if (TemperatureSensors.Count - tempSensor.Array_index == 0)
+                    { // new insert, Sensors may come in out of order
                         TemperatureSensors.Add(tempSensor);
-                    } else {
+                    }
+                    else
+                    {
                         // Prevent out of range exception on observable collections as code uses array indexes and sensors can come in out of order
                         return;
                     }
@@ -1166,32 +1343,43 @@ namespace TerrariumThermostat {
 
                     // Tempature Sensor Chart data handling
                     KeyValuePair<DateTime, double> newHistory = new KeyValuePair<DateTime, double>(tempSensor.Time_stamp, tempSensor.Reading);
-                    if (TempSensorsHistory.Count > tempSensor.Array_index) { // update an existing TempSensorsHistory
-                        if (newHistory.Key - _chartRefreshRate > TempSensorsHistory[tempSensor.Array_index].Last<KeyValuePair<DateTime, double>>().Key) {
-                            if (TempSensorsHistory[tempSensor.Array_index].Count == _maxChartReadings) {
+                    if (TempSensorsHistory.Count > tempSensor.Array_index)
+                    { // update an existing TempSensorsHistory
+                        if (newHistory.Key - _chartRefreshRate > TempSensorsHistory[tempSensor.Array_index].Last<KeyValuePair<DateTime, double>>().Key)
+                        {
+                            if (TempSensorsHistory[tempSensor.Array_index].Count == _maxChartReadings)
+                            {
                                 // Remove earliest entry to maintain collection size, update existing sensor history
                                 TempSensorsHistory[tempSensor.Array_index].RemoveAt(0);
                                 TempSensorsHistory[tempSensor.Array_index].Add(newHistory);
-                            } else if (TempSensorsHistory[tempSensor.Array_index].Count > _maxChartReadings) {
+                            }
+                            else if (TempSensorsHistory[tempSensor.Array_index].Count > _maxChartReadings)
+                            {
                                 Logger.Log(null, "TempSensorsHistory[tempSensor.Array_index].Count > _maxChartReadings");
-                            } else { // add the new entry to the sensor history
+                            }
+                            else
+                            { // add the new entry to the sensor history
                                 TempSensorsHistory[tempSensor.Array_index].Add(newHistory);
                             }
                         }
-                    } else if (TempSensorsHistory.Count == tempSensor.Array_index) { // this is a new sensor history
+                    }
+                    else if (TempSensorsHistory.Count == tempSensor.Array_index)
+                    { // this is a new sensor history
                         ObservableCollection<KeyValuePair<DateTime, double>> newHistories = new ObservableCollection<KeyValuePair<DateTime, double>>();
                         newHistories.Add(newHistory);
                         TempSensorsHistory.Add(newHistories);
                     }
 
-                    if (tempSensor.Array_index == 0) {
+                    if (tempSensor.Array_index == 0)
+                    {
                         //Messages.Add("TempSensorsHistory[" + tempSensor.Array_index + "].Count: " + TempSensorsHistory[tempSensor.Array_index].Count);
                         //Messages.Add("TempSensorsHistory[" + tempSensor.Array_index + "] first time: " + TempSensorsHistory[tempSensor.Array_index][0].Key);
                         //Messages.Add("TempSensorsHistory[" + tempSensor.Array_index + "] last time: " + TempSensorsHistory[tempSensor.Array_index][TempSensorsHistory[tempSensor.Array_index].Count - 1].Key);
                         TempSensorChartSetXAxisRange();
                     }
 
-                    if (tempSensor.Array_index == TempSensorsHistory.Count() - 1) {
+                    if (tempSensor.Array_index == TempSensorsHistory.Count() - 1)
+                    {
                         TempSensorsChartSetYAxisRange();
                     }
                 }
@@ -1203,14 +1391,12 @@ namespace TerrariumThermostat {
             //    //Messages.Add("TempSensorsHistory[" + tempSensor.Array_index + "] last time: " + TempSensorsHistory[tempSensor.Array_index][TempSensorsHistory[tempSensor.Array_index].Count - 1].Key);
             //    TempSensorChartSetXAxisRange();
             //}
-
-            //if (tempSensor.Array_index == TempSensorsHistory.Count() - 1) {
-            //    TempSensorsChartSetYAxisRange();
-            //}
         }
 
-        private void TempSensorChartSetXAxisRange() {
-            if (TempSensorsHistory.Count == 0 || TempSensorsHistory[0].Count == 0) {
+        private void TempSensorChartSetXAxisRange()
+        {
+            if (TempSensorsHistory.Count == 0 || TempSensorsHistory[0].Count == 0)
+            {
                 return;
             }
 
@@ -1229,8 +1415,10 @@ namespace TerrariumThermostat {
             tempSensorsChart.ActualAxes.OfType<DateTimeAxis>().FirstOrDefault(ax => ax.Orientation == AxisOrientation.X).Interval = GetChartInterval_X((chartLastTime - chartFirstTime).TotalMinutes);
         }
 
-        private void TempSensorsChartSetYAxisRange() {
-            if (TempSensorsHistory[0].Count == 0) { // No point to set with, use ConfigOption defaults.
+        private void TempSensorsChartSetYAxisRange()
+        {
+            if (TempSensorsHistory[0].Count == 0)
+            { // No point to set with, use ConfigOption defaults.
                 tempSensorsChart.ActualAxes.OfType<LinearAxis>().FirstOrDefault(ay => ay.Orientation == AxisOrientation.Y).Maximum = ChartOptions[0].MaxChartY;
                 tempSensorsChart.ActualAxes.OfType<LinearAxis>().FirstOrDefault(ay => ay.Orientation == AxisOrientation.Y).Minimum = ChartOptions[0].MinChartY;
                 return;
@@ -1238,31 +1426,37 @@ namespace TerrariumThermostat {
 
             double? newMax = null;
             double? newMin = null;
-            foreach (ObservableCollection<KeyValuePair<DateTime, double>> tsh in TempSensorsHistory) {
+            foreach (ObservableCollection<KeyValuePair<DateTime, double>> tsh in TempSensorsHistory)
+            {
                 double maxValue = tsh.Max(x => x.Value);
-                if (newMax == null || maxValue > newMax) {
+                if (newMax == null || maxValue > newMax)
+                {
                     newMax = maxValue;
                 }
 
                 double minValue = tsh.Min(x => x.Value);
-                if (newMin == null || minValue < newMin) {
+                if (newMin == null || minValue < newMin)
+                {
                     newMin = minValue;
                 }
             }
 
             LinearAxis yAxis = tempSensorsChart.ActualAxes.OfType<LinearAxis>().FirstOrDefault(ay => ay.Orientation == AxisOrientation.Y);
             newMax = Math.Ceiling((double)newMax);
-            if (newMax != null && yAxis.Maximum != (int)newMax) {
+            if (newMax != null && yAxis.Maximum != (int)newMax)
+            {
                 yAxis.Maximum = ((int)newMax);
             }
 
             newMin = (int)Math.Floor((double)newMin);
-            if (newMin != null && yAxis.Minimum != newMin) {
+            if (newMin != null && yAxis.Minimum != newMin)
+            {
                 yAxis.Minimum = (int)newMin;
             }
         }
 
-        private void TempSensorScatterChartAdd() {
+        private void TempSensorScatterChartAdd()
+        {
             SolidColorBrush brush = new SolidColorBrush(GetChartColor(tempSensorsChart.Series.Count));
             Style style = new Style(typeof(ScatterDataPoint));
 
@@ -1288,14 +1482,18 @@ namespace TerrariumThermostat {
             tempSensorsChart.Series.Add(line);
         }
 
-        private void AddMessage(string message) {
-            try {
+        private void AddMessage(string message)
+        {
+            try
+            {
                 Messages.Add("Message Received: " + message);
-                if (message[0] == '{') {
+                if (message[0] == '{')
+                {
 
                     dynamic objectMessage = JsonConvert.DeserializeObject(message);
 
-                    if (objectMessage.PhotoSensor != null) {
+                    if (objectMessage.PhotoSensor != null)
+                    {
                         PhotoSensor photoSensor = new PhotoSensor();
 
                         photoSensor.Array_index = objectMessage.PhotoSensor.array_index;
@@ -1303,12 +1501,17 @@ namespace TerrariumThermostat {
                         photoSensor.Reading = objectMessage.PhotoSensor.reading;
                         photoSensor.Time_stamp = DateTime.Now;
 
-                        if (PhotoSensors.Count > photoSensor.Array_index) {
+                        if (PhotoSensors.Count > photoSensor.Array_index)
+                        {
                             PhotoSensors[photoSensor.Array_index] = photoSensor;
-                        } else if (PhotoSensors.Count <= photoSensor.Array_index) {
+                        }
+                        else if (PhotoSensors.Count <= photoSensor.Array_index)
+                        {
                             PhotoSensors.Add(photoSensor);
                         }
-                    } else if (objectMessage.TempSensor != null) { // has an issue with not catching the first "Message" and trying to insert to indexes > 0 first (can happen on a switch when messages are being received)
+                    }
+                    else if (objectMessage.TempSensor != null)
+                    { // has an issue with not catching the first "Message" and trying to insert to indexes > 0 first (can happen on a switch when messages are being received)
                         TempSensor tempSensor = new TempSensor();
 
                         tempSensor.Pin = objectMessage.TempSensor.pin;
@@ -1321,7 +1524,9 @@ namespace TerrariumThermostat {
                         tempSensor.Temp_offset = objectMessage.TempSensor.temp_offset;
                         tempSensor.Time_stamp = DateTime.Now;
                         TempSensorAddReading(tempSensor);
-                    } else if (objectMessage.TempControlledDevice != null) { // has an issue with not catching the first "Message" and trying to insert to indexes > 0 first (can happen on a switch when messages are being received)
+                    }
+                    else if (objectMessage.TempControlledDevice != null)
+                    { // has an issue with not catching the first "Message" and trying to insert to indexes > 0 first (can happen on a switch when messages are being received)
                         TempControlledDevice temp = new TempControlledDevice();
 
                         temp.Current_state = objectMessage.TempControlledDevice.current_state;
@@ -1337,14 +1542,19 @@ namespace TerrariumThermostat {
                         temp.Array_index = objectMessage.TempControlledDevice.array_index;
                         temp.Time_stamp = DateTime.Now;
 
-                        if (TemperatureSensors.Count > temp.Temp_sensor_array_index) {
+                        if (TemperatureSensors.Count > temp.Temp_sensor_array_index)
+                        {
                             temp.Sensor_reading = TemperatureSensors[temp.Temp_sensor_array_index].Reading.ToString("#00.00");
-                        } else {
+                        }
+                        else
+                        {
                             temp.Sensor_reading = "N/A";
                         }
 
                         TempDeviceAddReading(temp);
-                    } else if (objectMessage.PhotoControlledDevice != null) { // has an issue with not catching the first "Message" and trying to insert to indexes > 0 first (can happen on a switch when messages are being received)
+                    }
+                    else if (objectMessage.PhotoControlledDevice != null)
+                    { // has an issue with not catching the first "Message" and trying to insert to indexes > 0 first (can happen on a switch when messages are being received)
                         PhotoControlledDevice temp = new PhotoControlledDevice();
 
                         temp.Current_state = objectMessage.PhotoControlledDevice.current_state;
@@ -1355,34 +1565,45 @@ namespace TerrariumThermostat {
                         temp.Array_index = objectMessage.PhotoControlledDevice.array_index;
                         temp.Time_stamp = DateTime.Now;
 
-                        if (PhotoControlledDevices.Count > temp.Array_index) {  // update already existing
+                        if (PhotoControlledDevices.Count > temp.Array_index)
+                        {  // update already existing
                             PhotoControlledDevices[temp.Array_index] = temp;
-                        } else if (PhotoControlledDevices.Count <= temp.Array_index) {  // new insert
+                        }
+                        else if (PhotoControlledDevices.Count <= temp.Array_index)
+                        {  // new insert
                             PhotoControlledDevices.Add(temp);
                         }
                     }
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Logger.Log(ex, "Processing Message: " + message);
                 return;
             }
         }
 
-        private void WriteConfigFile() {
-            try {
+        private void WriteConfigFile()
+        {
+            try
+            {
                 string appSettings = JsonConvert.SerializeObject(_appSettings);
                 File.WriteAllText(_configPath, appSettings);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Logger.Log(ex, null);
             }
         }
 
-        private void UseApplicationSettings() {
+        private void UseApplicationSettings()
+        {
             _maxChartReadings = _appSettings["MAX_CHART_READINGS"] == null ? _maxChartReadings : Int32.Parse(_appSettings["MAX_CHART_READINGS"].ToString());
             _maxMessageCount = _appSettings["MAX_MESSAGE_COUNT"] == null ? _maxMessageCount : Int32.Parse(_appSettings["MAX_MESSAGE_COUNT"].ToString());
             _chartRefreshRate = _appSettings["CHART_REFRESH_RATE"] == null ? _chartRefreshRate : TimeSpan.Parse(_appSettings["CHART_REFRESH_RATE"].ToString());
             _minChartRangeX = _appSettings["MIN_CHART_RANGE_X"] == null ? _minChartRangeX : TimeSpan.Parse(_appSettings["MIN_CHART_RANGE_X"].ToString());
-            if (_appSettings["MAX_CHART_Y"] != null && _appSettings["MIN_CHART_Y"] != null) {
+            if (_appSettings["MAX_CHART_Y"] != null && _appSettings["MIN_CHART_Y"] != null)
+            {
                 ChartOptions = new ObservableCollection<ChartOption>
                 {
                     new ChartOption{
@@ -1393,10 +1614,13 @@ namespace TerrariumThermostat {
             }
         }
 
-        private void SetupDefaults() {
-            try {
+        private void SetupDefaults()
+        {
+            try
+            {
                 UseApplicationSettings();
-                if (!File.Exists(_configPath)) {
+                if (!File.Exists(_configPath))
+                {
                     WriteConfigFile();
                     return;
                 }
@@ -1404,7 +1628,9 @@ namespace TerrariumThermostat {
                 string appSettings = File.ReadAllText(_configPath);
                 _appSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(appSettings);
                 UseApplicationSettings();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Logger.Log(ex, null);
             }
         }
@@ -1416,7 +1642,8 @@ namespace TerrariumThermostat {
         /// Used to run an asyncronous action on the GUI thread 
         /// </summary>
         /// <param name="action">Action to run</param>
-        public static void BeginInvoke(Action action) {
+        public static void BeginInvoke(Action action)
+        {
             Application.Current.Dispatcher.BeginInvoke(action);
         }
 
@@ -1424,7 +1651,8 @@ namespace TerrariumThermostat {
         /// Used to run an syncronous action on the GUI thread 
         /// </summary>
         /// <param name="action">Action to run</param>
-        public static void Invoke(Action action) {
+        public static void Invoke(Action action)
+        {
             Application.Current.Dispatcher.Invoke(action);
         }
 
@@ -1434,22 +1662,29 @@ namespace TerrariumThermostat {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="message"></param>
-        public void _selectedComPort_OnMessageReceived(object sender, string message) {
-            try {
-                if (String.IsNullOrWhiteSpace(message) == true) {
+        public void _selectedComPort_OnMessageReceived(object sender, string message)
+        {
+            try
+            {
+                if (String.IsNullOrWhiteSpace(message) == true)
+                {
                     Logger.Log(null, "_selectedComPort_OnMessageReceived -> message null or empty");
                     return;
                 }
 
                 // Keep Messages.Count from exceeding Max Items for ObservableCollection
-                if (Messages.Count > _maxMessageCount) {
+                if (Messages.Count > _maxMessageCount)
+                {
                     int numToRemove = Messages.Count - _maxMessageCount;
-                    for (int i = 0; i < numToRemove; ++i) {
+                    for (int i = 0; i < numToRemove; ++i)
+                    {
                         Invoke(() => Messages.RemoveAt(0));
                     }
                 }
                 Invoke(() => AddMessage(message));
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Logger.Log(ex, null);
             }
         }
@@ -1458,20 +1693,24 @@ namespace TerrariumThermostat {
     public class Logger {
         private static string _logPath = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName) + @"\errorlog.txt";
 
-        public static void Log(Exception ex, string msg = null) {
-            if (ex == null && msg == null) {
+        public static void Log(Exception ex, string msg = null)
+        {
+            if (ex == null && msg == null)
+            {
                 return;
             }
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(new String('-', 50));
             sb.AppendLine("Date: " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToLongTimeString());
-            if (!String.IsNullOrWhiteSpace(msg)) {
+            if (!String.IsNullOrWhiteSpace(msg))
+            {
                 sb.AppendLine("Application Message: " + msg);
             }
 
             #region exception output
-            if (ex != null) {
+            if (ex != null)
+            {
                 Type exType = ex.GetType();
                 sb.AppendLine("Message: " + ex.Message);
                 sb.AppendLine("Type: " + ex.GetType());
@@ -1484,13 +1723,17 @@ namespace TerrariumThermostat {
             sb.AppendLine(new String('-', 50));
             sb.AppendLine("");
 
-            try {
+            try
+            {
                 File.AppendAllText(_logPath, sb.ToString());
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 // crop, no log for this getting generated
             }
 
-            if (ex != null && ex.InnerException != null) {
+            if (ex != null && ex.InnerException != null)
+            {
                 Log(ex.InnerException, "Inner Exception");
             }
         }
@@ -1499,9 +1742,11 @@ namespace TerrariumThermostat {
     #region IValueConverter Classes
     [ValueConversion(typeof(string), typeof(bool))]
     public class OnOfConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             // test the paramater to apply correct formatting or default string for defined values.
-            if (parameter.ToString().ToLower() == "state") {
+            if (parameter.ToString().ToLower() == "state")
+            {
                 bool v = bool.Parse(value.ToString());
                 if (v)
                     return "On";
@@ -1510,38 +1755,58 @@ namespace TerrariumThermostat {
             }
             return "convert not defined - OnOfConverter";
         }
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             return null;
         }
     }
 
     [ValueConversion(typeof(string), typeof(int))]
     public class StateConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
-            if (int.TryParse(value.ToString(), out int v)) {
-                switch (parameter.ToString()) {
-                    case "state": {
-                            if (v == 1) {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (int.TryParse(value.ToString(), out int v))
+            {
+                switch (parameter.ToString())
+                {
+                    case "state":
+                        {
+                            if (v == 1)
+                            {
                                 return "Above reading";
-                            } else if (v == 0) {
+                            }
+                            else if (v == 0)
+                            {
                                 return "Below reading";
-                            } else {
+                            }
+                            else
+                            {
                                 return "convert not defined for number " + v + " - StateConverter.Convert";
                             }
                         }
-                    case "error_state": {
-                            if (v > 0) {
+                    case "error_state":
+                        {
+                            if (v > 0)
+                            {
                                 return "Error!";
-                            } else {
+                            }
+                            else
+                            {
                                 return "Good";
                             }
                         }
-                    case "on_error_state": {
-                            if (v == 1) {
+                    case "on_error_state":
+                        {
+                            if (v == 1)
+                            {
                                 return "On";
-                            } else if (v == 0) {
+                            }
+                            else if (v == 0)
+                            {
                                 return "Off";
-                            } else {
+                            }
+                            else
+                            {
                                 return "convert not defined for number " + v + " - StateConverter.Convert";
                             }
                         }
@@ -1551,7 +1816,8 @@ namespace TerrariumThermostat {
             }
             return "value failed to convert - StateConverter.Convert";
         }
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             throw new NotImplementedException();
             //return null;
         }
@@ -1559,29 +1825,39 @@ namespace TerrariumThermostat {
 
     [ValueConversion(typeof(string), typeof(double))]
     public class DoubleConverterFixedTwo : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
-            if (Double.TryParse(value.ToString(), out double v)) {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (Double.TryParse(value.ToString(), out double v))
+            {
                 return v.ToString("0.00");
-            } else {
+            }
+            else
+            {
                 return "value failed to convert - DoubleConverterFixedTwo.Convert";
             }
         }
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             throw new NotImplementedException();
         }
     }
 
     [ValueConversion(typeof(string), typeof(DateTime))]
     public class DateTimeConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
-            try {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            try
+            {
                 return ((DateTime)value).ToString("HH:mm:ss");
-            } catch (InvalidCastException ex) {
+            }
+            catch (InvalidCastException ex)
+            {
                 Logger.Log(ex, null);
                 return "value failed to convert - DateTimeConverter.Convert";
             }
         }
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             throw new NotImplementedException();
         }
     }
